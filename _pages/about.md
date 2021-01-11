@@ -8,6 +8,10 @@ My background is in theoretical physics (quantum fields and strings) and I now w
 
 In my spare time, I enjoy ski touring, mountain biking and cycling, especially in the Swiss Alps where I grew up.
 
+In this blog, I am sharing learnings from my data science and applied mathematics journey, so hopefully you won't get stuck at the same sticky places.
+
+[]({{site.baseurl}}/images/me_herens.jpg)
+
 ## Selected publications
 - [Bayesian modeling for the detection of adverse events underreporting in clinical trials](https://www.medrxiv.org/content/10.1101/2020.12.18.20245068v1) (preprint, submitted to Drug Safety)
 - [Enabling Data-Driven Clinical Quality Assurance: Predicting Adverse Event Reporting in Clinical Trials Using Machine Learning](https://link.springer.com/article/10.1007/s40264-019-00831-4)
