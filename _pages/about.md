@@ -12,6 +12,7 @@ In this blog, I am sharing learnings from my data science and applied mathematic
 
 ![]({{site.baseurl}}/images/me_herens.jpg){:style="float: right;margin-right: 7px;margin-top: 20px;"}
 
+  
 ## Get in touch
 You can email me at yves.barma@gmail.com if you add the missing z before @.
 
