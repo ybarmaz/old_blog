@@ -8,9 +8,12 @@ My background is in theoretical physics (quantum fields and strings) and I now w
 
 In my spare time, I enjoy ski touring, mountain biking and cycling, especially in the Swiss Alps where I grew up.
 
-In this blog, I am sharing learnings from my data science and applied mathematics journey, so hopefully you won't get stuck at the same sticky places.
+In this blog, I am sharing learnings from my data science and applied mathematics journey, so hopefully you won't get stuck to the same sticky places.
 
-![]({{site.baseurl}}/images/me_herens.jpg){:style="float: right;margin-right: 7px;margin-top: 7px;"}
+![]({{site.baseurl}}/images/me_herens.jpg){:style="float: right;margin-right: 7px;margin-top: 20px;"}
+
+## Get in touch
+You can email me at yves.barma@gmail.com if you add the missing z before @.
 
 ## Selected publications
 - [Bayesian modeling for the detection of adverse events underreporting in clinical trials](https://www.medrxiv.org/content/10.1101/2020.12.18.20245068v1) (preprint, submitted to Drug Safety)
