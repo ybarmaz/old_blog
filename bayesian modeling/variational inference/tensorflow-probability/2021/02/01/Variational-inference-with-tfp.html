@@ -173,7 +173,11 @@ window.onload = wrap_img;
     <span class="n">tfd</span><span class="o">.</span><span class="n">Sample</span><span class="p">(</span><span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.</span><span class="p">),</span> <span class="n">true_params</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
     <span class="c1"># observations</span>
     <span class="k">lambda</span> <span class="n">features</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">true_offset</span> <span class="o">+</span>
-                                   <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">true_params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                                   <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">features</span><span class="p">,</span>
+                                                <span class="n">tf</span><span class="o">.</span><span class="n">convert_to_tensor</span><span class="p">(</span>
+                                                    <span class="n">true_params</span><span class="p">,</span> 
+                                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                                                <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 <span class="p">])</span>
 
 <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">true_generating_process</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
@@ -207,7 +211,9 @@ window.onload = wrap_img;
     <span class="c1">#alpha</span>
     <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">20.</span><span class="p">),</span>
     <span class="c1">#observations</span>
-    <span class="k">lambda</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">betas</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span><span class="n">tfd</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">betas</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+        <span class="n">tfd</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="p">])</span>
 
 <span class="c1"># Specify the MCMC algorithm.</span>
@@ -311,118 +317,6 @@ window.onload = wrap_img;
 </div>
     
 
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>mean</th>
-      <th>sd</th>
-      <th>hdi_3%</th>
-      <th>hdi_97%</th>
-      <th>mcse_mean</th>
-      <th>mcse_sd</th>
-      <th>ess_mean</th>
-      <th>ess_sd</th>
-      <th>ess_bulk</th>
-      <th>ess_tail</th>
-      <th>r_hat</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>beta[0]</th>
-      <td>1.095</td>
-      <td>0.145</td>
-      <td>0.823</td>
-      <td>1.368</td>
-      <td>0.001</td>
-      <td>0.001</td>
-      <td>34201.0</td>
-      <td>33151.0</td>
-      <td>34433.0</td>
-      <td>31987.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>beta[1]</th>
-      <td>0.079</td>
-      <td>0.122</td>
-      <td>-0.147</td>
-      <td>0.312</td>
-      <td>0.000</td>
-      <td>0.001</td>
-      <td>74333.0</td>
-      <td>29295.0</td>
-      <td>74378.0</td>
-      <td>32250.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>beta[2]</th>
-      <td>-1.840</td>
-      <td>0.184</td>
-      <td>-2.190</td>
-      <td>-1.501</td>
-      <td>0.001</td>
-      <td>0.001</td>
-      <td>23574.0</td>
-      <td>23363.0</td>
-      <td>23694.0</td>
-      <td>29070.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>alpha</th>
-      <td>1.223</td>
-      <td>0.142</td>
-      <td>0.957</td>
-      <td>1.492</td>
-      <td>0.001</td>
-      <td>0.001</td>
-      <td>35014.0</td>
-      <td>34357.0</td>
-      <td>35198.0</td>
-      <td>33159.0</td>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Variational-inference-with-tfp.vi">Variational inference with tfp.vi<a class="anchor-link" href="#Variational-inference-with-tfp.vi"> </a></h2><p>The dedicated tool for variational inference in TensorFlow-Probability, <code>tfp.vi.fit_surrogate_posterior</code>, requires a similar amount of preparatory work as <code>tfp.mcmc</code> algorithms. The specification of the target posterior is actually the same.</p>
@@ -443,7 +337,9 @@ window.onload = wrap_img;
     <span class="c1">#offset</span>
     <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">20.</span><span class="p">),</span>
     <span class="c1">#observations</span>
-    <span class="k">lambda</span> <span class="n">offset</span><span class="p">,</span> <span class="n">betas</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span><span class="n">tfd</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">offset</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">lambda</span> <span class="n">offset</span><span class="p">,</span> <span class="n">betas</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+        <span class="n">tfd</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">logits</span><span class="o">=</span><span class="n">offset</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+        <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="p">])</span>
 
 <span class="n">unnormalized_log_prob</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">mdl_logreg</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span><span class="p">,))</span>
@@ -686,7 +582,9 @@ window.onload = wrap_img;
     <span class="n">tfk</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Activation</span><span class="p">(</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">)</span>
 <span class="p">])</span>
 
-<span class="n">classical_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">loss</span><span class="o">=</span><span class="n">tfk</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">BinaryCrossentropy</span><span class="p">())</span>
+<span class="n">classical_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+                        <span class="n">loss</span><span class="o">=</span><span class="n">tfk</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">BinaryCrossentropy</span><span class="p">()</span>
+                       <span class="p">)</span>
 
 <span class="n">classical_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </pre></div>
@@ -736,9 +634,13 @@ window.onload = wrap_img;
 
 <span class="c1"># Specify the prior over `keras.layers.Dense` `kernel` and `bias`.</span>
 <span class="k">def</span> <span class="nf">prior_ridge</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">,</span> <span class="n">bias_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">return</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span><span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">kernel_size</span> <span class="o">+</span> <span class="n">bias_size</span><span class="p">),</span>
-                                                <span class="n">scale</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="mi">5</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">),</span> <span class="mi">20</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">bias_size</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)),</span>
-                                     <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+        <span class="n">tfd</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">kernel_size</span> <span class="o">+</span> <span class="n">bias_size</span><span class="p">),</span>
+                   <span class="n">scale</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="mi">5</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">),</span>
+                                    <span class="mi">20</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">bias_size</span><span class="p">)],</span>
+                                   <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)),</span>
+        <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
 
 <span class="c1"># Specify the model</span>
 <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">([</span>
@@ -795,11 +697,17 @@ $$<p>where $N$ is the number of data points. The first term in the sum correspon
 <span class="n">params_history</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="n">params_callback</span> <span class="o">=</span> <span class="n">tfk</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">LambdaCallback</span><span class="p">(</span>
-    <span class="n">on_epoch_end</span><span class="o">=</span><span class="k">lambda</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">params_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">get_model_stats</span><span class="p">(</span><span class="n">probabilistic_model</span><span class="p">))))</span>
+    <span class="n">on_epoch_end</span><span class="o">=</span><span class="k">lambda</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">params_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">get_model_stats</span><span class="p">(</span><span class="n">probabilistic_model</span><span class="p">))))</span>
 
 
-<span class="n">probabilistic_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span> <span class="n">loss</span><span class="o">=</span><span class="n">negloglik</span><span class="p">)</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">params_callback</span><span class="p">])</span>
+<span class="n">probabilistic_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+                            <span class="n">loss</span><span class="o">=</span><span class="n">negloglik</span>
+                           <span class="p">)</span>
+
+<span class="n">history</span> <span class="o">=</span> <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+                                  <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                  <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">params_callback</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -875,23 +783,6 @@ $$<p>where $N$ is the number of data points. The first term in the sum correspon
 
 </div>
 
-</div>
-</div>
-
-</div>
-    
-
-    
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bnn_mean</span><span class="p">,</span> <span class="n">bnn_std</span> <span class="o">=</span> <span class="n">get_model_stats</span><span class="p">(</span><span class="n">probabilistic_model</span><span class="p">)</span>
-</pre></div>
-
-    </div>
 </div>
 </div>
 
@@ -1012,7 +903,7 @@ $$<p>where $N$ is the number of data points. The first term in the sum correspon
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The results are very similar across the three methods. Convergence is quite faster with variational inference, but it requires a bit more work to specify sensible variational families.</p>
 <p>While <code>tfp.vi</code> is applicable to a wider class of problems, <code>tfp.layers</code> gives access to Keras functionalities such as callbacks, and, more interestingly, batch training with the <code>tf.data.Dataset</code> API.</p>
-<p>There is no definitive rule for which method to apply to which problem, but it is important to be aware of the limitations and benefits of variational inference algorithms before using them. In this example we knew the true parameters in advance, but in real applications, one should have validation procedures in place to ensure the variational family is large enough to capture the phenomenon of interest, for instance by comparison with MCMC results, or for prediction tasks with a test sets where the labels/outcomes are known.</p>
+<p>There is no definitive rule for which method to apply to which problem, but it is important to be aware of the limitations and benefits of variational inference algorithms before using them. In this example we knew the true parameters in advance, but in real applications, one should have validation procedures in place to ensure the variational family is large enough to capture the phenomenon of interest, for instance by comparison with MCMC results, or for prediction tasks with a test set where the labels/outcomes are known.</p>
 
 </div>
 </div>
