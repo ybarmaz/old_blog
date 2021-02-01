@@ -611,7 +611,8 @@ window.onload = wrap_img;
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the negative log likelihood loss function for the `DistributionLambda` head of the model.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Define the negative log likelihood loss function for the `DistributionLambda`</span>
+<span class="c1"># head of the model.</span>
 <span class="n">negloglik</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">rv_y</span><span class="p">:</span> <span class="o">-</span><span class="n">rv_y</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
 <span class="c1"># Define a function to constrain the scale parameters to the real positive</span>
