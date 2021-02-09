@@ -482,7 +482,7 @@ $$<p>Unfortunately, there is no immediate congugate prior for this type of likel
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Learning-strategy">Learning strategy<a class="anchor-link" href="#Learning-strategy"> </a></h1><p>In the learning phase of the model, at each step a new context $x_i$ is observed (or drawn from the population), an action $a_i$ is chosen, a reward $r_i$ is observed (or simulated with <code>bandit.pull</code>), and the model is updated.</p>
+<h2 id="Learning-strategy">Learning strategy<a class="anchor-link" href="#Learning-strategy"> </a></h2><p>In the learning phase of the model, at each step a new context $x_i$ is observed (or drawn from the population), an action $a_i$ is chosen, a reward $r_i$ is observed (or simulated with <code>bandit.pull</code>), and the model is updated.</p>
 
 </div>
 </div>
@@ -490,7 +490,9 @@ $$<p>Unfortunately, there is no immediate congugate prior for this type of likel
     
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Code" data-close="Show Code"></summary>
+        <p><div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
@@ -503,7 +505,22 @@ $$<p>Unfortunately, there is no immediate congugate prior for this type of likel
 <span class="sd">      bandit: an instance of the ContextualBandit class</span>
 <span class="sd">    </span>
 <span class="sd">    methods:</span>
-<span class="sd">      thompson_randomize</span>
+<span class="sd">      thompson_randomize(X): draws logits from the posterior distribution and</span>
+<span class="sd">                             returns the arms with the highest values</span>
+<span class="sd">      </span>
+<span class="sd">      _update_step(X, y): updates the model with the new observations</span>
+<span class="sd">      </span>
+<span class="sd">      one_trial(n, population): samples n elements from population, selects</span>
+<span class="sd">                             an arm for each of them through Thompson sampling,</span>
+<span class="sd">                             pulls it, updates the model</span>
+<span class="sd">      </span>
+<span class="sd">      train_on_data(X_train, all_outcomes_train): implements Thompson sampling</span>
+<span class="sd">                             on pre-sampled data where an omnicient being has</span>
+<span class="sd">                             pulled all the arms. The reason is to compare with</span>
+<span class="sd">                             standard Bayesian inference on the same data</span>
+<span class="sd">                            </span>
+<span class="sd">      evaluate_training_decisions: returns statistics about action selection</span>
+<span class="sd">                             during training</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bandit</span><span class="p">):</span>
@@ -585,7 +602,8 @@ $$<p>Unfortunately, there is no immediate congugate prior for this type of likel
     </div>
 </div>
 </div>
-
+</p>
+    </details>
 </div>
     
 
