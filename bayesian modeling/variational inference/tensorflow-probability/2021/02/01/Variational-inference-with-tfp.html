@@ -152,7 +152,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If you plan to automate the execution of multible Bayesian inference jobs, typically to regularly update your posterior distribution as new data comes in, you might find that MCMC algorithms take too long to sample their chains. Variational inference can speed things up considerably (you can find a good introduction <a href="https://arxiv.org/abs/1601.00670">here</a>), at the expense of converging only to an approximation of the true posterior, which is often good enough for practical applications.</p>
-<p>Lately, I have been experimenting with TensorFlow-Probability variational inference tools, namely <code>tfp.vi.fit_surrogate_posterior</code> and <code>tfp.layers</code>, to see how to integrate them into some of my projects.</p>
+<p>Lately, I have been experimenting with TensorFlow-Probability that implement <a href="https://arxiv.org/abs/1603.00788">automatic differentiation variational inference</a>, namely <code>tfp.vi.fit_surrogate_posterior</code> and <code>tfp.layers</code>, to see how to integrate them into some of my projects.</p>
 <p>I collected insights from various guides, tutorials, and code documentation, that I am summarizing here, mainly for future reference, but also for the benefit of people I will manage to convert to Bayesianism. The code is applied to a toy example of Bayesian logistic regression on simulated data, because it is helpful in this context to compare results to the true parameters of the data generating process.</p>
 
 </div>
@@ -674,7 +674,7 @@ $$<p>which depends only on the likelihood, the prior, and the variational distri
 $$
 - \mathrm{ELBO} =  \mathbb{E}_Q\left[ \sum_i \left( - \log P(X_i \vert Z) + \frac{1}{N}( \log Q(Z) - \log P(Z))\right) \right]
 $$<p>where $N$ is the number of data points. The first term in the sum corresponds to the negative log-likelihood passed as the <code>loss</code> argument to <code>probabilistic_model.compile</code>. The rest of the sum is a regularization implemented in <code>tfp.layers.DenseVariational</code>, where $Q(Z)$ corresponds to the <code>make_posterior_fn</code> argument, $P(Z)$ to <code>make_prior_fn</code>, and $N$ to <code>kl_weight=1/X.shape[0]</code>.</p>
-<p>As a side note, the sample size argument in <code>tfp.vi.fit_surrogate_posterior</code> gives the number of points sampled from $Q$ to compute a Monte Carlo estimate of the negative ELBO.</p>
+<p>As a side note, the sample size argument in <code>tfp.vi.fit_surrogate_posterior</code> gives the number of points sampled from $Q$ to compute a Monte Carlo estimate of the gradient of the ELBO.</p>
 <p>With the Keras API, we can use callbacks to collect training statistics or implement early stopping policies, and we have access to the <code>tf.data.Dataset</code> API for batch training (<code>kl_weight</code> would need to be adapted accordingly). Here we use callbacks to record the parameters of the variational distribution during training.</p>
 
 </div>
