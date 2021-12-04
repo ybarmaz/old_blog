@@ -157,20 +157,20 @@ window.onload = wrap_img;
 <p>I finally spent some time playing around with JAX. I was especially curious about its automatic differentiation system, which is obviously very useful to compute gradients in machine learning, but also opens up new possibilities for physical modeling. In particular, <a href="https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html">the Autodiff Cookbook</a> advertises the correspondence between the <code>grad</code> API and differential geometry, which is the fundamental language of classical mechanics.</p>
 <p>Concretely, you can quickly define functions on the phase space with <code>jax.numpy</code> and then automatically compute their gradients. The phase space is the space of all possible states of a physical system, for instance the positions $\vec x_i$ of its constituent particles and their momenta $\vec p_i$, or the orientation of a rigid body and its angular momentum. In general, the coordinates of a phase space can always be locally chosen so that they are split into positions $\mathbf{q} = (q_1, \dots, q_n)$ and conjugate momenta $\mathbf{p} = (p_1, \dots, p_n)$, and their time evolution is given by the equations of motion</p>
 $$
-\begin{align*} 
+\begin{aligned} 
 \dot{\mathbf{q}} &amp;=  \frac{\partial H}{\partial \mathbf{p}} = \lbrace \mathbf{q}, H \rbrace \\ 
-\dot{\mathbf{p}} &amp;=  -\frac{\partial H}{\partial \mathbf{q}} = \lbrace \mathbf{p}, H \rbrace
-\end{align*}
+\dot{\mathbf{p}} &amp;=  -\frac{\partial H}{\partial \mathbf{q}} = \lbrace \mathbf{p}, H \rbrace 
+\end{aligned} \tag{1}
 $$<p>where $H(\mathbf{q}, \mathbf{p})$ is the <em>Hamiltonian function</em> of the system, or simply the <em>Hamiltonian</em>, which is essentially its energy. With automatic differentiation, all you need to build this set of differential equations is to specify the Hamiltonian function, which can spare you a lot of pain.</p>
 <p>The curly braces are the Poisson bracket, a fundamental structure of the phase space. In the canonical coordinates $(\mathbf{q}, \mathbf{p})$, also called the <em>Darboux coordinates</em>, it is defined as</p>
 $$
 \lbrace f, g \rbrace = \sum_{i=1}^n\left(
   \frac{\partial f}{\partial q_i}\frac{\partial g}{\partial p_i}
   - \frac{\partial f}{\partial p_i}\frac{\partial g}{\partial q_i}
-\right)
+\right) \tag{2}
 $$<p>for any two functions $f$ and $g$ on the phase space. Together with the Hamiltonian function, the Poisson bracket encodes the time evolution of any observable of the system (a quantity that depends on the state of the system and can be measured),</p>
 $$
-\frac d{dt}f(\mathbf{q}, \mathbf{p}, t) = \lbrace f, H \rbrace + \frac{\partial f}{\partial t}.
+\frac d{dt}f(\mathbf{q}, \mathbf{p}, t) = \lbrace f, H \rbrace + \frac{\partial f}{\partial t}. \tag{3}
 $$<p>The mathematical interpretation is that the Poisson bracket transforms the Hamiltonian function $H$ into a vectorfield $\lbrace \cdot, H \rbrace$, the so-called <em>Hamiltonian vectorfield</em>.</p>
 <p>The Poisson bracket is also an essential piece in the connection between classical and quantum mechanics, but this is another story and we will get back to it when quantum computers are more broadly available.</p>
 <p>In JAX, the Poisson bracket in Darboux coordinates can be defined as a function that takes as its arguments two functions of <code>q</code> and <code>p</code> and returns a third function of <code>q</code> and <code>p</code>, where <code>q</code> and <code>p</code> are arrays.</p>
