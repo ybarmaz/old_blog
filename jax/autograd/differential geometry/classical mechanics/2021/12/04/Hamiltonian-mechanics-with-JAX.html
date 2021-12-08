@@ -171,7 +171,7 @@ $$
 $$<p>for any two functions $f$ and $g$ on the phase space. Together with the Hamiltonian function, the Poisson bracket encodes the time evolution of any observable of the system (a quantity that depends on the state of the system and can be measured),</p>
 $$
 \frac d{dt}f(\mathbf{q}, \mathbf{p}, t) = \lbrace f, H \rbrace + \frac{\partial f}{\partial t}. \tag{3}
-$$<p>The mathematical interpretation is that the Poisson bracket transforms the Hamiltonian function $H$ into a vectorfield $\lbrace \cdot, H \rbrace$, the so-called <em>Hamiltonian vectorfield</em>.</p>
+$$<p>The mathematical interpretation is that the Poisson bracket transforms the Hamiltonian function $H$ into a vector field $\lbrace \cdot, H \rbrace$, the so-called <em>Hamiltonian vector field</em>.</p>
 <p>The Poisson bracket is also an essential piece in the connection between classical and quantum mechanics, but this is another story and we will get back to it when quantum computers are more broadly available.</p>
 <p>In JAX, the Poisson bracket in Darboux coordinates can be defined as a function that takes as its arguments two functions of <code>q</code> and <code>p</code> and returns a third function of <code>q</code> and <code>p</code>, where <code>q</code> and <code>p</code> are arrays.</p>
 
