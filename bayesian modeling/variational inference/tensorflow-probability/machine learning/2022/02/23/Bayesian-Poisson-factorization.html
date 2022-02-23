@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Bayesian Poisson factorization | Yves Barmaz</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Bayesian Poisson factorization" />
+<meta name="author" content="Yves Barmaz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A probabilistic recommender system implemented with TensorFlow Probability layers." />
+<meta property="og:description" content="A probabilistic recommender system implemented with TensorFlow Probability layers." />
+<link rel="canonical" href="https://ybarmaz.github.io/blog/bayesian%20modeling/variational%20inference/tensorflow-probability/machine%20learning/2022/02/23/Bayesian-Poisson-factorization.html" />
+<meta property="og:url" content="https://ybarmaz.github.io/blog/bayesian%20modeling/variational%20inference/tensorflow-probability/machine%20learning/2022/02/23/Bayesian-Poisson-factorization.html" />
+<meta property="og:site_name" content="Yves Barmaz" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-02-23T00:00:00-06:00" />
+<script type="application/ld+json">
+{"dateModified":"2022-02-23T00:00:00-06:00","datePublished":"2022-02-23T00:00:00-06:00","url":"https://ybarmaz.github.io/blog/bayesian%20modeling/variational%20inference/tensorflow-probability/machine%20learning/2022/02/23/Bayesian-Poisson-factorization.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://ybarmaz.github.io/blog/bayesian%20modeling/variational%20inference/tensorflow-probability/machine%20learning/2022/02/23/Bayesian-Poisson-factorization.html"},"headline":"Bayesian Poisson factorization","author":{"@type":"Person","name":"Yves Barmaz"},"description":"A probabilistic recommender system implemented with TensorFlow Probability layers.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://ybarmaz.github.io/blog/feed.xml" title="Yves Barmaz" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Yves Barmaz</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Bayesian Poisson factorization</h1><p class="page-description">A probabilistic recommender system implemented with TensorFlow Probability layers.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-02-23T00:00:00-06:00" itemprop="datePublished">
+        Feb 23, 2022
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Yves Barmaz</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#bayesian modeling">bayesian modeling</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#variational inference">variational inference</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#tensorflow-probability">tensorflow-probability</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#machine learning">machine learning</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/ybarmaz/blog/tree/master/_notebooks/2022-02-23-Bayesian-Poisson-factorization.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/ybarmaz/blog/master?filepath=_notebooks%2F2022-02-23-Bayesian-Poisson-factorization.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/ybarmaz/blog/blob/master/_notebooks/2022-02-23-Bayesian-Poisson-factorization.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022-02-23-Bayesian-Poisson-factorization.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A lot of recommender systems are built on <a href="https://en.wikipedia.org/wiki/Matrix_factorization_(recommender_systems">matrix factorization</a>) models, where the partially observed matrix of user/item interactions is approximated by a product of matrices encoding latent characteristics of users and items. They can be corrected by user and item bias terms, and modified by activation functions that map to the data type of the observed interactions (e.g. binary kudos on Strava activities, counts of visits of a YouTube channel, ratings on Tripadvisor, or time spent watching a TikTok video before swiping up).</p>
+<p>In machine learning, these matrix factorizations are often implemented as embeddings into latent spaces followed by scalar products of the user latent vectors by the item latent vectors, and the model is fit to historical data with a gradient descent algorithm. A <a href="https://keras.io/examples/structured_data/collaborative_filtering_movielens/">Keras tutorial on collaborative filtering</a> describes the methodology with the Movielens dataset.</p>
+<p>While the resulting model only provides point estimates of future interactions between users and items, a Bayesian treatment of the problem would add an approximation of the uncertainty of these estimates. Formally, we could express the same model with priors on the vector embeddings in a probabilistic programming library and sample the posteriors with an MCMC algorithm, but computing the likelihood of past interactions can be impractical for very large datasets. Moreover, due to the invariance of the model under permutations of the embedding dimensions, MCMC sampling of the multimodal posterior would be a nightmare. On the other hand, minimizing $KL(q \Vert p)$ through variational inference produces a mode-seeking behavior (see for instance these <a href="https://www.fil.ion.ucl.ac.uk/~wpenny/talks/inference.pdf">lecture notes</a>), a bit like gradient descent in "classical" machine learning finds a local minimum.</p>
+<p>In this blog post, we will be exploring how to implement a model inspired by Gopalan, Hofman and Blei (<a href="https://arxiv.org/abs/1311.1704">Scalable Recommendation with Poisson Factorization</a>) with <a href="https://www.tensorflow.org/probability">TensorFLow Probability</a>.</p>
+<p>In the mean field approximation, where we assume that the variational distribution $q$ factorizes over the latent variables, we can implement variational inference with probabilistic layers from the <code>tfp.layers</code> module. One way to do it is to specify the variational distribution $q$ with a <code>tfpl.DistributionLambda(lambda variational_parameter: ...)</code> layer and add its interaction with the prior in the <a href="https://en.wikipedia.org/wiki/Evidence_lower_bound">ELBO</a> through an activity regularizer, <code>activity_regularizer = tfpl.KLDivergenceRegularizer(prior_distribution)</code>. For probabilistic embeddings, the variational parameters are conveniently expressed as standard embeddings into a space of dimension $n_{params} \times D$, where $D$ is the dimension of the original latent embeddings, and $n_{params}$ the number of variational parameters of the corresponding component of $q$.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <a href="https://keras.io/guides/making_new_layers_and_models_via_subclassing/">custom Keras layer</a> wraps the construction of a probabilistic embedding, with its <code>__init__</code> method receiving the hyperparameters. Here we picked Gamma distributions for both the priors and the variational distributions.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">GammaEmbedding</span><span class="p">(</span><span class="n">tfkl</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">,</span>
+                 <span class="n">embedding_concentration</span><span class="p">,</span> <span class="n">embedding_rate</span><span class="p">,</span> <span class="n">kl_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GammaEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_parameters</span> <span class="o">=</span> <span class="n">tfkl</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span>
+            <span class="n">num_classes</span><span class="p">,</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">embedding_size</span><span class="p">,</span>
+            <span class="n">embeddings_initializer</span><span class="o">=</span><span class="s2">&quot;he_normal&quot;</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_distribution</span> <span class="o">=</span> <span class="n">tfpl</span><span class="o">.</span><span class="n">DistributionLambda</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+                <span class="n">tfd</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="p">:</span><span class="n">embedding_size</span><span class="p">]),</span>
+                          <span class="n">rate</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">embedding_size</span><span class="p">:])),</span>
+                <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">activity_regularizer</span> <span class="o">=</span> <span class="n">tfpl</span><span class="o">.</span><span class="n">KLDivergenceRegularizer</span><span class="p">(</span>
+                <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+                    <span class="n">tfd</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="n">embedding_concentration</span>
+                              <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">embedding_size</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                              <span class="n">rate</span><span class="o">=</span><span class="n">embedding_rate</span><span class="p">),</span>
+                    <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="n">kl_weight</span><span class="p">,</span>
+                <span class="n">use_exact_kl</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+            
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">embedding_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_parameters</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_distribution</span><span class="p">(</span><span class="n">embedding_param</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The bias terms mentioned earlier could be implemented as one-dimensional probabilistic embeddings and added to the scalar products of user and item embeddings, but Gopalan <em>et al.</em> suggest to introduce these degrees of freedom as hyperpriors for the rate parameters of the embedding Gamma distributions with a hierarchical model construction. We can still use one-dimensional embeddings to construct these rate distributions, but the same technique is not suitable for the embeddings themselves. The problem is that the priors in <code>tfpl.KLDivergenceRegularizer(prior, weight)</code> are fixed, but we need them to evolve with the variational parameters of their hyperprior during training. As a workaround, we can specify a custom loss term with the <code>add_loss</code> method.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">HierarchicalGammaEmbedding</span><span class="p">(</span><span class="n">tfkl</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">,</span>
+                 <span class="n">parent_concentration</span><span class="p">,</span> <span class="n">parent_rate</span><span class="p">,</span>
+                 <span class="n">embedding_concentration</span><span class="p">,</span> <span class="n">kl_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HierarchicalGammaEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">=</span> <span class="n">kl_weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_concentration</span> <span class="o">=</span> <span class="n">embedding_concentration</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_distribution</span> <span class="o">=</span> <span class="n">GammaEmbedding</span><span class="p">(</span>
+            <span class="n">num_classes</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">parent_concentration</span><span class="p">,</span>
+            <span class="n">parent_rate</span><span class="p">,</span> <span class="n">kl_weight</span><span class="o">=</span><span class="n">kl_weight</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_parameters</span> <span class="o">=</span> <span class="n">tfkl</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span>
+            <span class="n">num_classes</span><span class="p">,</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">embedding_size</span><span class="p">,</span>
+            <span class="n">embeddings_initializer</span><span class="o">=</span><span class="s2">&quot;glorot_normal&quot;</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_distribution</span> <span class="o">=</span> <span class="n">tfpl</span><span class="o">.</span><span class="n">DistributionLambda</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+                <span class="n">tfd</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="p">:</span><span class="n">embedding_size</span><span class="p">]),</span>
+                          <span class="n">rate</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">embedding_size</span><span class="p">:])),</span>
+                <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+            
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">embedding_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_parameters</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="n">embedding_distribution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_distribution</span><span class="p">(</span><span class="n">embedding_param</span><span class="p">)</span>
+        
+        <span class="n">embedding_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_distribution</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>        
+        <span class="n">embedding_prior</span> <span class="o">=</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Independent</span><span class="p">(</span>
+            <span class="n">tfd</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_concentration</span><span class="p">,</span>
+                      <span class="n">rate</span><span class="o">=</span><span class="n">embedding_rate</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">EMBEDDING_SIZE</span><span class="p">))),</span>
+            <span class="n">reinterpreted_batch_ndims</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kl_weight</span> <span class="o">*</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">embedding_distribution</span><span class="o">.</span><span class="n">kl_divergence</span><span class="p">(</span><span class="n">embedding_prior</span><span class="p">))</span>
+        <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">embedding_distribution</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With the probabilistic embeddings defined as custom layers, the full model only needs a few lines of code. The user and movie embeddings are constructed as hierarchical Gamma embeddings, and their scalar product will be the rate of the Poisson distribution that generates the observations, implemented as a distribution lambda layer.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ProbabilisticRecommender</span><span class="p">(</span><span class="n">tfk</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_users</span><span class="p">,</span> <span class="n">num_movies</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">,</span> <span class="n">kl_weight</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ProbabilisticRecommender</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_users</span> <span class="o">=</span> <span class="n">num_users</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_movies</span> <span class="o">=</span> <span class="n">num_movies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding_size</span> <span class="o">=</span> <span class="n">embedding_size</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_embedding</span> <span class="o">=</span> <span class="n">HierarchicalGammaEmbedding</span><span class="p">(</span>
+            <span class="n">num_users</span><span class="p">,</span>
+            <span class="n">embedding_size</span><span class="p">,</span>
+            <span class="n">parent_concentration</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">parent_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">embedding_concentration</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">kl_weight</span><span class="o">=</span><span class="n">kl_weight</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">movie_embedding</span> <span class="o">=</span> <span class="n">HierarchicalGammaEmbedding</span><span class="p">(</span>
+            <span class="n">num_movies</span><span class="p">,</span>
+            <span class="n">embedding_size</span><span class="p">,</span>
+            <span class="n">parent_concentration</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">parent_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">embedding_concentration</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">kl_weight</span><span class="o">=</span><span class="n">kl_weight</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">tfpl</span><span class="o">.</span><span class="n">DistributionLambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">tfd</span><span class="o">.</span><span class="n">Poisson</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">user_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_embedding</span><span class="p">(</span><span class="n">inputs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">movie_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">movie_embedding</span><span class="p">(</span><span class="n">inputs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">dot_user_movie</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">user_vector</span> <span class="o">*</span> <span class="n">movie_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">dot_user_movie</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>With a probability distribution as an output, this model requires a negative log-likelihood loss function, otherwise it is straightforward to train it like any Keras model.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">EMBEDDING_SIZE</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">KL_WEIGHT</span> <span class="o">=</span>  <span class="mi">1</span><span class="o">/</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">negloglik</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">rv_y</span><span class="p">:</span> <span class="o">-</span><span class="n">rv_y</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">prob_model</span> <span class="o">=</span> <span class="n">ProbabilisticRecommender</span><span class="p">(</span><span class="n">num_users</span><span class="p">,</span> <span class="n">num_movies</span><span class="p">,</span> <span class="n">EMBEDDING_SIZE</span><span class="p">,</span> <span class="n">KL_WEIGHT</span><span class="p">)</span>
+<span class="n">prob_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="n">loss</span><span class="o">=</span><span class="n">negloglik</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">tfk</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Once the model has been trained, we can call it on new user/item pairs to produce a Poisson distribution of posterior predicted observations. We can directly sample user ratings from this distribution with <code>.sample()</code>, or call its <code>.rate_parameter()</code> method to find the posterior predicted rate. The latter offers a higher resolution to rank items for a given user (it is a continuous variable rather than an integer) and is therefore more practical for recommender systems.</p>
+<p>When the model is called, each probabilistic layer returns a single sample from its learned variational distribution. To estimate the posterior predicted Poisson rate of a user/item interaction, one can call the model several times to obtain a sample. In real world applications, drawing a single Poisson rate or only a few of them rather than estimating the posterior mean to score an item might prove more useful as it offers a broader variety of suggestions to users whose tastes are less certain, namely with user embedding distributions of higher variance. It addresses the exploration-exploitation trade-off with a mechanism similar to <a href="https://en.wikipedia.org/wiki/Thompson_sampling">Thompson sampling</a> (see also this previous <a href="https://ybarmaz.github.io/blog/contextual%20bandits/reinforcement%20learning/bayesian%20modeling/variational%20inference/probabilistic%20machine%20learning/tensorflow-probability/2021/02/09/Contextual_bandits.html">blog post</a>).</p>
+<p>In general, users who have provided less ratings or good ratings across a large spectrum of items will get less defined embeddings, and this approach will give them recommendations that explore the item landscape more broadly than for users with tighter embeddings. These users with better-known tastes will still get random suggestions relatively far from their usual preference, albeit less frequently than the users with less defined embeddings, but this is not something that happens with models based on classical embeddings, which always return the same results.</p>
+<p>This mechanism is also interesting when acquiring new users who have not yet provided ratings. We can itialize their embeddings to match the priors, or learned distributions from similar users but with wider variance, and use this untrained model to draw recommendations that are compatible with our prior knowledge. When they start giving ratings, we can train the corresponding user embedding layers to incorporate the new knowledge, while freezing the item embedding layers for stability and increased speed.</p>
+<p>With TensorFlow Probability layers, we can thus add a Bayesian flavor to more traditional recommender systems and address issues such as exploration-exploitation trade-offs or cold starts in a more principled way. From another angle, we can express probabilistic models such as matrix factorization models as Keras models and take advantage of the <code>tf.data.Dataset</code> API for batch training with potentially large datasets.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="ybarmaz/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/blog/bayesian%20modeling/variational%20inference/tensorflow-probability/machine%20learning/2022/02/23/Bayesian-Poisson-factorization.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>A blog about data science and applied math.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/ybarmaz" target="_blank" title="ybarmaz"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.instagram.com/naxadventurextreme" target="_blank" title="naxadventurextreme"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#instagram"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/yves-barmaz-454a8a6" target="_blank" title="yves-barmaz-454a8a6"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/YvesBarmaz" target="_blank" title="YvesBarmaz"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
